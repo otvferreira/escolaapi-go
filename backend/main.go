@@ -5,11 +5,30 @@ import (
 	"backend/config" // Importando o pacote config
 	"backend/models" // Importando o pacote models
 	"backend/routes" // Importando o pacote routes
+	"log"
+	"os"
 
 	"github.com/gin-gonic/gin" // Importando o framework Gin
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
+
+	// Carregar o arquivo de configuração
+	configFile := "config/config.yaml"
+	file, err := os.Open(configFile)
+	if err != nil {
+		log.Fatalf("Erro ao abrir o arquivo de configuração: %v", err)
+	}
+	defer file.Close()
+
+	// Analisar o arquivo de configuração
+	var configData map[string]interface{}
+	decoder := yaml.NewDecoder(file)
+	if err := decoder.Decode(&configData); err != nil {
+		log.Fatalf("Erro ao analisar o arquivo de configuração: %v", err)
+	}
+
 	// Inicializando o Gin
 	r := gin.Default()
 
