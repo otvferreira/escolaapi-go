@@ -4,9 +4,13 @@ FROM golang:1.20-buster AS builder
 # Defina o diretório de trabalho
 WORKDIR /app
 
-# Copie o código fonte e o go.mod
+# Copie o go.mod e go.sum
 COPY go.mod go.sum ./
+
+# Baixe as dependências
 RUN go mod download
+
+# Copie o restante do código
 COPY . .
 
 # Construa o binário
@@ -23,4 +27,3 @@ WORKDIR /app
 
 # Defina o comando para rodar o binário
 CMD ["./main"]
-
