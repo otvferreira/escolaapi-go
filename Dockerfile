@@ -1,20 +1,33 @@
-# Use uma imagem base do Go
+# Etapa de build
 FROM golang:1.20 AS builder
 
 # Defina o diretório de trabalho
-WORKDIR /backend
+WORKDIR /app
 
-# Copie o código-fonte para o diretório de trabalho
-COPY . .
+# Copie o go.mod e go.sum para o diretório de trabalho
+COPY backend/go.mod backend/go.sum ./
 
-# Compile a aplicação
-RUN go build -o main .
+# Baixe as dependências
+RUN go mod download
 
-# Use uma imagem base menor para rodar a aplicação
+# Copie o restante do código para o diretório de trabalho
+COPY backend .
+
+# Compile o binário
+RUN go build -o main ./main.go
+
+# Etapa final: usar uma imagem mínima para rodar a aplicação
 FROM debian:bullseye-slim
 
-# Copie o binário da imagem de build
-COPY --from=builder /backend/main /backend/main
+# Copie o binário da etapa de build
+COPY --from=builder /app/main /app/main
 
-# Defina o comando para rodar a aplicação
-CMD ["/backend/main"]
+# Defina o diretório de trabalho
+WORKDIR /app
+
+# Exponha a porta em que a aplicação vai rodar
+EXPOSE 8080
+
+# Comando para rodar a aplicação
+CMD ["/app/main"]
+
