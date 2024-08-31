@@ -40,7 +40,7 @@ func main() {
 
 	r.GET("/professores", routes.GetProfessores)
 	r.GET("/professores/buscar/:id", routes.GetProfessor)
-	r.POST("/professores/adicionar/", routes.CreateProfessor)
+	r.POST("/professores/adicionar", routes.CreateProfessor)
 	r.PUT("/professores/alterar/:id", routes.UpdateProfessor)
 	r.DELETE("/professores/deletar/:id", routes.DeleteProfessor)
 
