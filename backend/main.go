@@ -8,7 +8,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin" // Importando o framework Gin
+	"github.com/gin-contrib/cors" // Importando o middleware CORS
+	"github.com/gin-gonic/gin"    // Importando o framework Gin
 	"gopkg.in/yaml.v2"
 )
 
@@ -31,6 +32,13 @@ func main() {
 
 	// Inicializando o Gin
 	r := gin.Default()
+
+	// Configurar CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:3000"}, // Substitua pelo URL do seu frontend
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
+	}))
 
 	// Conectando ao banco de dados
 	config.ConnectDatabase()
