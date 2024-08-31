@@ -1,4 +1,3 @@
-// backend/config/db.go
 package config
 
 import (
@@ -24,7 +23,7 @@ type Config struct {
 }
 
 func LoadConfig() Config {
-	data, err := os.ReadFile("config/config.yaml") // Usando os.ReadFile em vez de ioutil.ReadFile
+	data, err := os.ReadFile("config/config.yaml")
 	if err != nil {
 		log.Fatalf("error reading config file: %v", err)
 	}
@@ -41,8 +40,8 @@ func LoadConfig() Config {
 func ConnectDatabase() {
 	config := LoadConfig()
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		config.DB.Host, config.DB.User, config.DB.Password, config.DB.Name, config.DB.Port)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		config.DB.Host, config.DB.Port, config.DB.User, config.DB.Password, config.DB.Name)
 
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

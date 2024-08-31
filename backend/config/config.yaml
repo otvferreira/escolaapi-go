@@ -1,6 +1,6 @@
 db:
   user: "postgres"
-  password: "root"
-  host: "localhost"
-  port: 5433
-  name: "ofcescola" 
+  password: "GktVEbEDqJINaZNzbYkyKfKudRimiiCO"
+  host: "autorack.proxy.rlwy.net"
+  port: 48783
+  name: "railway"

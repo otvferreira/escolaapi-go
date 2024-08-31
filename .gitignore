@@ -1,2 +1,2 @@
 # Ignorar arquivos de configuração sensíveis
-config/config.yaml
+backend/config/config.yaml
