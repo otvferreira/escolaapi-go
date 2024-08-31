@@ -35,9 +35,10 @@ func main() {
 
 	// Configurar CORS
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"}, // Substitua pelo URL do seu frontend
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowCredentials: true,
 	}))
 
 	// Conectando ao banco de dados
