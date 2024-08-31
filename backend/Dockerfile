@@ -1,29 +1,29 @@
-# Use uma imagem base para construção
+# Etapa de construção
 FROM golang:1.20-buster AS builder
 
-# Defina o diretório de trabalho
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copie o go.mod e go.sum
-COPY go.mod go.sum ./
+# Copie o arquivo go.mod e go.sum
+COPY backend/go.mod backend/go.sum ./
 
 # Baixe as dependências
 RUN go mod download
 
 # Copie o restante do código
-COPY . .
+COPY backend/ .
 
-# Construa o binário
+# Compile o binário
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./main.go
 
-# Use uma imagem base leve para o runtime
+# Etapa final
 FROM debian:bullseye-slim
 
-# Copie o binário do estágio de construção
+# Copie o binário da etapa de construção
 COPY --from=builder /app/main /app/main
 
-# Defina o diretório de trabalho
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Defina o comando para rodar o binário
+# Comando para iniciar o aplicativo
 CMD ["./main"]
