@@ -1,0 +1,6 @@
+db:
+  user: "postgres"
+  password: "root"
+  host: "localhost"
+  port: 5433
+  name: "ofcescola" 
