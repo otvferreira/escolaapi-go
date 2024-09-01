@@ -79,6 +79,7 @@ func main() {
 	r.POST("/notas", routes.CreateNota)
 	r.PUT("/notas/alterar/:id", routes.UpdateNota)
 	r.DELETE("/notas/deletar/:id", routes.DeleteNota)
+	r.GET("/notas/:turma_id/:atividade_id", routes.GetNotasByTurmaEAtividade)
 
 	r.GET("/turmas", routes.GetTurmas)
 	r.GET("/turmas/buscar/:id", routes.GetTurma)

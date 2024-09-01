@@ -19,7 +19,6 @@ func GetAlunosByTurma(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": alunos})
 }
 
-// Função para criar uma nova nota
 func CreateNota(c *gin.Context) {
 	var nota models.Nota
 	if err := c.ShouldBindJSON(&nota); err != nil {
@@ -132,4 +131,16 @@ func DeleteNota(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, nil)
+}
+
+func GetNotasByTurmaEAtividade(c *gin.Context) {
+	turmaID := c.Param("turma_id")
+	atividadeID := c.Param("atividade_id")
+
+	var notas []models.Nota
+	if err := config.DB.Where("turma_id = ? AND atividade_id = ?", turmaID, atividadeID).Find(&notas).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": notas})
 }
