@@ -14,6 +14,14 @@ func CreateAtividade(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Verificar se a turma existe
+	var turma models.Turma
+	if err := config.DB.First(&turma, atividade.TurmaID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Turma não encontrada"})
+		return
+	}
+
 	if err := config.DB.Create(&atividade).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -44,13 +52,22 @@ func UpdateAtividade(c *gin.Context) {
 	id := c.Param("id")
 	var atividade models.Atividade
 	if err := config.DB.First(&atividade, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Atividade not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Atividade não encontrada"})
 		return
 	}
+
 	if err := c.ShouldBindJSON(&atividade); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Verificar se a turma existe
+	var turma models.Turma
+	if err := config.DB.First(&turma, atividade.TurmaID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Turma não encontrada"})
+		return
+	}
+
 	if err := config.DB.Save(&atividade).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
