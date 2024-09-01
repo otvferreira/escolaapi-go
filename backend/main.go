@@ -7,7 +7,6 @@ import (
 	"backend/routes" // Importando o pacote routes
 	"log"
 	"os"
-	"time"
 
 	"github.com/gin-contrib/cors" // Importando o middleware CORS
 	"github.com/gin-gonic/gin"    // Importando o framework Gin
@@ -34,13 +33,16 @@ func main() {
 	// Inicializando o Gin
 	r := gin.Default()
 
-	// Configurar CORS
+	r.Use(func(c *gin.Context) {
+		log.Printf("Request: %s %s", c.Request.Method, c.Request.URL)
+		c.Next()
+	})
+
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
 	}))
 
 	// Middleware para lidar com requisições OPTIONS
