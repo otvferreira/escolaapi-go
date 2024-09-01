@@ -19,6 +19,7 @@ func GetAlunosByTurma(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": alunos})
 }
 
+// routes/notas.go
 func CreateNota(c *gin.Context) {
 	var nota models.Nota
 	if err := c.ShouldBindJSON(&nota); err != nil {
