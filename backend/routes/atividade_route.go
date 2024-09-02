@@ -19,34 +19,46 @@ func validarTotalPontos(turmaID uint) (float64, error) {
 
 func CreateAtividade(c *gin.Context) {
 	var atividade models.Atividade
+
 	if err := c.ShouldBindJSON(&atividade); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos. Verifique os campos obrigatórios."})
+		return
+	}
+
+	if atividade.TurmaID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O campo 'turma_id' é obrigatório."})
+		return
+	}
+
+	if atividade.Valor <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O campo 'valor' deve ser maior que zero."})
 		return
 	}
 
 	// Verificar se a turma existe
 	var turma models.Turma
 	if err := config.DB.First(&turma, atividade.TurmaID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Turma não encontrada"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Turma não encontrada."})
 		return
 	}
 
 	// Validar total de pontos
 	total, err := validarTotalPontos(atividade.TurmaID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao calcular o total de pontos."})
 		return
 	}
 
 	if total+atividade.Valor > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Total de pontos ultrapassa 100 pontos"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Total de pontos ultrapassa 100 pontos."})
 		return
 	}
 
 	if err := config.DB.Create(&atividade).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao criar atividade."})
 		return
 	}
+
 	c.JSON(http.StatusCreated, atividade)
 }
 
@@ -72,47 +84,49 @@ func GetAtividade(c *gin.Context) {
 func UpdateAtividade(c *gin.Context) {
 	id := c.Param("id")
 	var atividade models.Atividade
+
 	if err := config.DB.First(&atividade, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Atividade não encontrada"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Atividade não encontrada."})
 		return
 	}
 
-	if err := c.ShouldBindJSON(&atividade); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var newAtividade models.Atividade
+	if err := c.ShouldBindJSON(&newAtividade); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos. Verifique os campos obrigatórios."})
 		return
 	}
 
 	// Verificar se a turma existe
 	var turma models.Turma
-	if err := config.DB.First(&turma, atividade.TurmaID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Turma não encontrada"})
+	if err := config.DB.First(&turma, newAtividade.TurmaID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Turma não encontrada."})
 		return
 	}
 
 	// Validar total de pontos
-	total, err := validarTotalPontos(atividade.TurmaID)
+	total, err := validarTotalPontos(newAtividade.TurmaID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao calcular o total de pontos."})
 		return
 	}
 
-	// Subtrair o valor antigo da atividade para ajustar a validação
-	var oldAtividade models.Atividade
-	if err := config.DB.First(&oldAtividade, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Atividade não encontrada"})
-		return
-	}
-	total -= oldAtividade.Valor
+	// Subtrair o valor antigo da atividade antes de adicionar o novo
+	total = total - atividade.Valor + newAtividade.Valor
 
-	if total+atividade.Valor > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Total de pontos ultrapassa 100 pontos"})
+	if total > 100 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Total de pontos ultrapassa 100 pontos."})
 		return
 	}
+
+	atividade.TurmaID = newAtividade.TurmaID
+	atividade.Valor = newAtividade.Valor
+	atividade.Data = newAtividade.Data
 
 	if err := config.DB.Save(&atividade).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar atividade."})
 		return
 	}
+
 	c.JSON(http.StatusOK, atividade)
 }
 
