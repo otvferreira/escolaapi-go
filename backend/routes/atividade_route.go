@@ -3,17 +3,27 @@ package routes
 import (
 	"backend/config"
 	"backend/models"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Função para validar o total de pontos de uma turma
 func validarTotalPontos(turmaID uint) (float64, error) {
 	var total float64
-	if err := config.DB.Model(&models.Atividade{}).Where("turma_id = ?", turmaID).Select("SUM(valor)").Row().Scan(&total); err != nil {
+
+	// Adicionando log para depuração antes da consulta
+	log.Printf("Calculando o total de pontos para turma_id: %d", turmaID)
+
+	// Usando o método Pluck para extrair o total de pontos
+	err := config.DB.Model(&models.Atividade{}).Where("turma_id = ?", turmaID).Select("SUM(valor)").Row().Scan(&total)
+	if err != nil {
+		log.Printf("Erro ao calcular o total de pontos: %v", err) // Log do erro
 		return 0, err
 	}
+
+	log.Printf("Total de pontos para turma_id %d: %f", turmaID, total) // Log do resultado
+
 	return total, nil
 }
 
